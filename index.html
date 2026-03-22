@@ -990,25 +990,17 @@ document.getElementById('uploadArtInput').addEventListener('change', e => {
   e.target.value = '';
 });
 
-// Auto-search via iTunes API through CORS proxy
+// Auto-search via iTunes API (direct, works when hosted)
 document.getElementById('searchArtBtn').addEventListener('click', async () => {
   const band = currentBand || '';
   const album = document.getElementById('detailAlbum').value.trim();
   const query = album ? `${band} ${album}` : band;
   if (!query) { showToast('⚠️ Escribe el nombre del álbum primero'); return; }
   setArtLoading();
-  
-  const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=5&media=music`;
-  const proxies = [
-    `https://corsproxy.io/?${encodeURIComponent(itunesUrl)}`,
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}`,
-    `https://cors-anywhere.herokuapp.com/${itunesUrl}`,
-  ];
-
-  for (const proxyUrl of proxies) {
-    try {
-      const r = await fetch(proxyUrl);
-      if (!r.ok) continue;
+  try {
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=5&media=music`;
+    const r = await fetch(url);
+    if (r.ok) {
       const d = await r.json();
       if (d.results && d.results.length > 0) {
         const artUrl = d.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
@@ -1016,9 +1008,8 @@ document.getElementById('searchArtBtn').addEventListener('click', async () => {
         showToast('🎨 Portada encontrada!');
         return;
       }
-    } catch(e) { continue; }
-  }
-
+    }
+  } catch(e) {}
   setArtWrap(null);
   showToast('😕 No se encontró portada. Prueba subiendo una imagen.');
 });
