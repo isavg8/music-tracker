@@ -267,7 +267,7 @@ const DEFAULT_BANDS = ["10 Years","16","1349","1782","21 Savage","2 Chainz","2pa
 
 const STORAGE_KEY = 'music_tracker_v3';
 let bands = [], state = {}, currentFilter = 'all', searchQuery = '', isDark = true;
-let currentBand = null, currentAlbumId = null, artRating1 = 0, artRating2 = 0;
+let currentBand = null, currentAlbumId = null, artRating1 = 0, artRating2 = 0, pendingArt = null;
 
 // ===== HELPERS =====
 function normSort(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/^ñ/,'n~').replace(/ñ/g,'n~'); }
@@ -440,6 +440,7 @@ function deleteAlbum(albumId) {
 // ===== ALBUM MODAL (edit) =====
 function openAlbumModal(albumId) {
   currentAlbumId = albumId;
+  pendingArt = null;
   const albums = getBandAlbums(currentBand);
   const album = albumId ? albums.find(a=>a.id===albumId) : null;
   document.getElementById('albumModalTitle').textContent = albumId ? 'EDITAR ÁLBUM' : 'NUEVO ÁLBUM';
@@ -521,7 +522,7 @@ function renderAlbumModalBody(album) {
   body.querySelector('#uploadArtInput').addEventListener('change', e => {
     const file = e.target.files[0]; if (!file) return;
     const reader = new FileReader();
-    reader.onload = evt => { setArtWrap(evt.target.result); body._pendingArt = evt.target.result; showToast('🖼️ Imagen cargada!'); };
+    reader.onload = evt => { setArtWrap(evt.target.result); pendingArt = evt.target.result; showToast('🖼️ Imagen cargada!'); };
     reader.readAsDataURL(file); e.target.value='';
   });
 
@@ -537,7 +538,7 @@ function renderAlbumModalBody(album) {
         if (d.results?.length) {
           const artUrl = d.results[0].artworkUrl100.replace('100x100bb','600x600bb');
           const base64 = await urlToBase64(artUrl);
-          if (base64) { setArtWrap(base64); body._pendingArt = base64; showToast('🎨 Portada encontrada!'); return; }
+          if (base64) { setArtWrap(base64); pendingArt = base64; showToast('🎨 Portada encontrada!'); return; }
         }
       }
     } catch(e) {}
@@ -554,7 +555,7 @@ function renderAlbumModalBody(album) {
       id: currentAlbumId || uid(),
       name: body.querySelector('#albumName').value.trim(),
       link: body.querySelector('#albumLink').value.trim(),
-      artUrl: body._pendingArt || (currentAlbumId ? albums.find(a=>a.id===currentAlbumId)?.artUrl : '') || '',
+      artUrl: pendingArt || (currentAlbumId ? albums.find(a=>a.id===currentAlbumId)?.artUrl : '') || '',
       first: check1,
       second: check2 ? true : check1 ? check1 : false,
       rating1: artRating1,
