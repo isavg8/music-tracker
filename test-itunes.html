@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>iTunes API Test</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; background: #111; color: #eee; }
+  button { background: #a855f7; border: none; color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 15px; }
+  img { width: 200px; height: 200px; border-radius: 10px; margin-top: 10px; display: block; }
+  .status { margin: 6px 0; font-size: 13px; }
+  .ok { color: #a8e063; } .err { color: #ff6b6b; } .warn { color: #ffd700; }
+</style>
+</head>
+<body>
+<h2>🧪 iTunes + CORS Proxy Test</h2>
+<p>Testing: <strong>Agalloch — The Mantle</strong></p>
+<button onclick="runTest()">Run Test</button>
+<div id="out"></div>
+<script>
+async function runTest() {
+  const out = document.getElementById('out');
+  out.innerHTML = '<p class="status">⏳ Testing proxies...</p>';
+  const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent('agalloch the mantle')}&entity=album&limit=5&media=music`;
+  const proxies = [
+    { name: 'corsproxy.io', url: `https://corsproxy.io/?${encodeURIComponent(itunesUrl)}` },
+    { name: 'allorigins', url: `https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}` },
+    { name: 'direct', url: itunesUrl },
+  ];
+  for (const proxy of proxies) {
+    out.innerHTML += `<p class="status warn">🔄 Trying: ${proxy.name}...</p>`;
+    try {
+      const r = await fetch(proxy.url);
+      if (!r.ok) { out.innerHTML += `<p class="status err">❌ HTTP ${r.status}</p>`; continue; }
+      const d = await r.json();
+      out.innerHTML += `<p class="status ok">✅ ${proxy.name} worked! Got ${d.resultCount} results</p>`;
+      if (d.results?.length > 0) {
+        const artUrl = d.results[0].artworkUrl100?.replace('100x100bb', '600x600bb');
+        out.innerHTML += `<p class="status ok">🎨 Art URL: ${artUrl}</p>`;
+        out.innerHTML += `<img src="${artUrl}" alt="cover" onerror="this.insertAdjacentHTML('afterend','<p class=err>❌ Image blocked</p>');this.remove()">`;
+      }
+      return;
+    } catch(e) {
+      out.innerHTML += `<p class="status err">❌ ${proxy.name}: ${e.message}</p>`;
+    }
+  }
+  out.innerHTML += `<p class="status err">❌ All proxies failed.</p>`;
+}
+</script>
+</body>
+</html>
