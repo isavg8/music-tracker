@@ -17,31 +17,35 @@
 <script>
 async function runTest() {
   const out = document.getElementById('out');
-  out.innerHTML = '<p class="status">⏳ Testing proxies...</p>';
-  const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent('agalloch the mantle')}&entity=album&limit=5&media=music`;
-  const proxies = [
-    { name: 'corsproxy.io', url: `https://corsproxy.io/?${encodeURIComponent(itunesUrl)}` },
-    { name: 'allorigins', url: `https://api.allorigins.win/raw?url=${encodeURIComponent(itunesUrl)}` },
-    { name: 'direct', url: itunesUrl },
-  ];
-  for (const proxy of proxies) {
-    out.innerHTML += `<p class="status warn">🔄 Trying: ${proxy.name}...</p>`;
-    try {
-      const r = await fetch(proxy.url);
-      if (!r.ok) { out.innerHTML += `<p class="status err">❌ HTTP ${r.status}</p>`; continue; }
-      const d = await r.json();
-      out.innerHTML += `<p class="status ok">✅ ${proxy.name} worked! Got ${d.resultCount} results</p>`;
-      if (d.results?.length > 0) {
-        const artUrl = d.results[0].artworkUrl100?.replace('100x100bb', '600x600bb');
-        out.innerHTML += `<p class="status ok">🎨 Art URL: ${artUrl}</p>`;
-        out.innerHTML += `<img src="${artUrl}" alt="cover" onerror="this.insertAdjacentHTML('afterend','<p class=err>❌ Image blocked</p>');this.remove()">`;
+  out.innerHTML = '<p class="status">⏳ Fetching from iTunes directly...</p>';
+  try {
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent('agalloch the mantle')}&entity=album&limit=5&media=music`;
+    const r = await fetch(url);
+    out.innerHTML += `<p class="status ${r.ok?'ok':'err'}">HTTP: ${r.status}</p>`;
+    const d = await r.json();
+    out.innerHTML += `<p class="status ok">Results: ${d.resultCount}</p>`;
+    if (d.results?.length > 0) {
+      const raw = d.results[0].artworkUrl100;
+      out.innerHTML += `<p class="status warn">Raw artworkUrl100: <code>${raw}</code></p>`;
+      // Try multiple replacements
+      const attempts = [
+        raw.replace('100x100bb', '600x600bb'),
+        raw.replace('100x100bb.jpg', '600x600bb.jpg'),
+        raw.replace(/\/\d+x\d+bb/, '/600x600bb'),
+        raw,
+      ];
+      for (const url of [...new Set(attempts)]) {
+        out.innerHTML += `<p class="status warn">Trying: <code>${url}</code></p>`;
+        out.innerHTML += `<img src="${url}" style="width:150px;height:150px;border-radius:8px;object-fit:cover;display:block;margin:4px 0" 
+          onload="this.previousSibling.className='status ok'" 
+          onerror="this.previousSibling.className='status err';this.remove()">`;
       }
-      return;
-    } catch(e) {
-      out.innerHTML += `<p class="status err">❌ ${proxy.name}: ${e.message}</p>`;
+    } else {
+      out.innerHTML += `<p class="status err">No results found</p>`;
     }
+  } catch(e) {
+    out.innerHTML += `<p class="status err">❌ ${e.message}</p>`;
   }
-  out.innerHTML += `<p class="status err">❌ All proxies failed.</p>`;
 }
 </script>
 </body>
