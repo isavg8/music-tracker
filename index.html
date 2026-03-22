@@ -969,6 +969,24 @@ function setArtLoading() {
     `<div class="album-art-loading"><div class="spinner"></div><span>Buscando portada...</span></div>`;
 }
 
+async function urlToBase64(imgUrl) {
+  // Use wsrv.nl as image proxy to bypass Apple CDN restrictions
+  const proxyUrl = `https://wsrv.nl/?url=${encodeURIComponent(imgUrl)}&w=600&h=600&fit=cover&output=jpg`;
+  try {
+    const r = await fetch(proxyUrl);
+    if (!r.ok) throw new Error('proxy failed');
+    const blob = await r.blob();
+    return await new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onload = () => res(reader.result);
+      reader.onerror = rej;
+      reader.readAsDataURL(blob);
+    });
+  } catch(e) {
+    return null;
+  }
+}
+
 function saveArt(dataUrl) {
   setArtWrap(dataUrl);
   if (currentBand) {
@@ -1004,9 +1022,13 @@ document.getElementById('searchArtBtn').addEventListener('click', async () => {
       const d = await r.json();
       if (d.results && d.results.length > 0) {
         const artUrl = d.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
-        saveArt(artUrl);
-        showToast('🎨 Portada encontrada!');
-        return;
+        setArtLoading();
+        const base64 = await urlToBase64(artUrl);
+        if (base64) {
+          saveArt(base64);
+          showToast('🎨 Portada encontrada!');
+          return;
+        }
       }
     }
   } catch(e) {}
