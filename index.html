@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Music Tracker">
-<title>🎸 Music Tracker</title>
+<title>🎵 Club de Música</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -50,8 +50,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .search-icon { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:14px; pointer-events:none; }
 .add-btn { background:var(--accent); border:none; border-radius:10px; padding:0 14px; font-family:'Space Mono',monospace; font-size:18px; font-weight:700; color:#fff; cursor:pointer; flex-shrink:0; transition:all .15s; }
 .add-btn:active { transform:scale(.93); }
-.filter-tabs { display:flex; gap:5px; padding-bottom:10px; overflow-x:auto; scrollbar-width:none; }
+.filter-tabs { display:flex; gap:5px; padding-bottom:8px; overflow-x:auto; scrollbar-width:none; }
 .filter-tabs::-webkit-scrollbar { display:none; }
+.filter-tabs2 { display:flex; gap:5px; padding-bottom:10px; overflow-x:auto; scrollbar-width:none; }
+.filter-tabs2::-webkit-scrollbar { display:none; }
+.tab2 { padding:4px 11px; border-radius:18px; border:1px solid var(--border); background:transparent; color:var(--text-dim); font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:all .15s; }
+.tab2.active { background:var(--surface3); border-color:var(--border2); color:var(--text); font-weight:700; }
+.tab2.star-tab.active { background:#2a1f00; border-color:#a07000; color:var(--gold); }
 .tab { padding:5px 12px; border-radius:18px; border:1px solid var(--border); background:transparent; color:var(--text-dim); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:all .15s; }
 .tab.active { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:700; }
 
@@ -77,7 +82,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .band-name { font-size:14px; font-weight:500; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .band-row.has-albums .band-name { color:var(--purple1); }
 .band-row.all-second .band-name { color:var(--purple2); font-style:italic; }
-.band-meta { font-size:11px; color:var(--text-muted); margin-top:2px; display:flex; align-items:center; gap:6px; }
+.band-meta { font-size:11px; color:var(--text-muted); margin-top:2px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.band-avg-stars { color:var(--gold); font-size:11px; letter-spacing:1px; }
+.genre-chip { display:inline-block; background:var(--surface3); border:1px solid var(--border2); border-radius:10px; padding:1px 7px; font-size:10px; color:var(--text-dim); margin-top:2px; }
 .album-thumbs { display:flex; gap:3px; margin-top:3px; }
 .album-thumb { width:28px; height:28px; border-radius:5px; object-fit:cover; flex-shrink:0; }
 .album-thumb-placeholder { width:28px; height:28px; border-radius:5px; background:var(--surface3); display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
@@ -146,8 +153,10 @@ textarea.field-input { min-height:70px; }
 .star:active { transform:scale(1.3); }
 .save-btn { width:100%; background:var(--accent); border:none; border-radius:12px; padding:14px; font-family:'Space Mono',monospace; font-size:14px; font-weight:700; color:#fff; cursor:pointer; margin-top:18px; transition:all .15s; }
 .save-btn:active { transform:scale(.97); }
-.album-art-wrap { width:100%; margin-bottom:14px; border-radius:14px; overflow:hidden; background:var(--surface2); border:1px solid var(--border); max-height:220px; aspect-ratio:1; display:flex; align-items:center; justify-content:center; }
-.album-art-wrap img { width:100%; height:100%; object-fit:cover; display:block; border-radius:13px; }
+.album-art-wrap { width:100%; margin-bottom:14px; border-radius:14px; overflow:hidden; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; position:relative; }
+.album-art-wrap::before { content:''; display:block; padding-top:100%; }
+.album-art-wrap img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; border-radius:13px; background:var(--surface2); }
+.album-art-wrap .album-art-placeholder, .album-art-wrap .album-art-loading { position:absolute; }
 .album-art-placeholder { font-size:52px; opacity:.3; }
 .album-art-loading { font-size:13px; color:var(--text-muted); display:flex; flex-direction:column; align-items:center; gap:8px; }
 .spinner { width:22px; height:22px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
@@ -155,6 +164,21 @@ textarea.field-input { min-height:70px; }
 .art-btns { display:flex; gap:8px; margin-bottom:14px; }
 .art-btn { flex:1; padding:9px 6px; border-radius:9px; border:1px solid var(--border2); background:var(--surface3); color:var(--text-dim); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; transition:all .15s; }
 .art-btn:active { background:var(--check1-bg); border-color:var(--accent); color:var(--accent); }
+
+/* READ-ONLY FIELDS */
+.field-view { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:10px 12px; min-height:42px; }
+.field-view-text { font-size:14px; color:var(--text); flex:1; line-height:1.5; word-break:break-word; white-space:pre-wrap; }
+.field-view-text.empty { color:var(--text-muted); font-style:italic; }
+.edit-pencil { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; flex-shrink:0; padding:0 2px; transition:color .15s; }
+.edit-pencil:active { color:var(--accent); }
+.field-editing .field-view { display:none; }
+.field-static .field-input { display:none; }
+.field-static .field-view { display:flex; }
+
+/* SAVE REMINDER BANNER */
+.reminder-banner { position:fixed; bottom:0; left:0; right:0; background:var(--accent); color:#111; padding:12px 18px; display:flex; align-items:center; justify-content:space-between; gap:10px; z-index:300; font-size:13px; font-weight:600; transform:translateY(100%); transition:transform .4s cubic-bezier(.32,1.1,.72,1); }
+.reminder-banner.show { transform:translateY(0); }
+.reminder-banner button { background:#111; color:var(--accent); border:none; border-radius:8px; padding:7px 14px; font-family:'Space Mono',monospace; font-size:11px; font-weight:700; cursor:pointer; flex-shrink:0; }
 
 /* ADD MODAL */
 .add-input { width:100%; background:var(--surface2); border:1.5px solid var(--accent); border-radius:12px; padding:12px 14px; font-family:'DM Sans',sans-serif; font-size:16px; color:var(--text); outline:none; }
@@ -172,7 +196,7 @@ textarea.field-input { min-height:70px; }
 
 <div class="header">
   <div class="header-top">
-    <div class="logo"><div class="logo-dot"></div>MUSIC TRACKER</div>
+    <div class="logo"><div class="logo-dot"></div>CLUB DE MÚSICA</div>
     <div class="header-actions">
       <button class="icon-btn" id="ioBtn">💾</button>
       <button class="icon-btn" id="themeBtn">🌙</button>
@@ -191,13 +215,25 @@ textarea.field-input { min-height:70px; }
     <button class="tab" data-filter="first">1ª escucha ✓</button>
     <button class="tab" data-filter="second">2ª escucha ✓</button>
   </div>
+  <div class="filter-tabs2" id="genreFilterRow">
+    <button class="tab2 active" data-genre="all">🎵 Todos los géneros</button>
+  </div>
+  <div class="filter-tabs2" id="starFilterRow">
+    <button class="tab2 star-tab active" data-stars="0">⭐ Todas</button>
+    <button class="tab2 star-tab" data-stars="5">★★★★★</button>
+    <button class="tab2 star-tab" data-stars="4">★★★★+</button>
+    <button class="tab2 star-tab" data-stars="3">★★★+</button>
+    <button class="tab2 star-tab" data-stars="2">★★+</button>
+    <button class="tab2 star-tab" data-stars="1">★+</button>
+  </div>
 </div>
 
 <div class="stats-bar">
   <div class="stat"><span class="stat-value" id="totalCount">0</span><span class="stat-label">bandas</span></div>
   <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
   <div class="stat"><span class="stat-value acc" id="albumCount">0</span><span class="stat-label">álbumes</span></div>
-  <div class="stat" style="margin-left:10px"><span class="stat-value bl" id="secondCount">0</span><span class="stat-label">2ª esc.</span></div>
+  <div class="stat" style="margin-left:8px"><span class="stat-value" id="listenedCount" style="color:#c084fc">0</span><span class="stat-label">1ª esc.</span></div>
+  <div class="stat" style="margin-left:8px"><span class="stat-value bl" id="secondCount">0</span><span class="stat-label">2ª esc.</span></div>
 </div>
 
 <div class="list-scroll"><div id="listContainer"></div></div>
@@ -258,16 +294,82 @@ textarea.field-input { min-height:70px; }
   </div>
 </div>
 
+<!-- REMINDER BANNER -->
+<div class="reminder-banner" id="reminderBanner">
+  <span>💾 ¡Exporta tu progreso para no perderlo!</span>
+  <button id="reminderExportBtn">Exportar ahora</button>
+</div>
+
 <script>
-const DEFAULT_BANDS = ["10 Years","16","1349","1782","21 Savage","2 Chainz","2pac","36 Crazyfists","3teeth","40 Watt Sun","43","5 Finger Death Punch","65daysofstatic","7 Horns 7 Eyes","800percent","9 Treasures","A Perfect Circle","Abiotic","Acutor","AFI","After the Burial","Aggressive","Agalloch","Agony","Agrimonia","Akheron","Akercocke","Alcest","Alesana","Allegaeon","Allegiance","All Shall Perish","All That Remains","Alice in Chains","Altars of Grief","Amenra","Amon Amarth","Anaal Nathrakh","Anciients","Anekdoten","Angine de Poitrine","Animals as Leaders","Annihilator","Anthrax","Apocalyptica","Arch Enemy","Archspire","Arctic Monkeys","Ariana Grande","Armored Saint","As I Lay Dying","ASAP Rocky","Asking Alexandria","Astronoid","Asura","Aterciopelados","Athanator","Atilla","Audioslave","Audrey Fall","August Burns Red","Avantasia","Avenged Sevenfold","Avril Lavigne","Azure Emote","Baby Keem","Backxwash","Bad Omens","Balmog","Band of Skulls","Baroness","Bathory","Battle Beast","Be'lakor","Beartooth","Behemoth","Beenee","Ben Rosett","Between the Buried and Me","Beyond Creation","Bilmuri","Black Label Society","Black Peaks","Black Sabbath","Bleed From Within","Blind Guardian","Blink 182","Blood Incantation","Bloodbath","Born of Osiris","Borknagar","Botch","Boucle Infinie","Boy Pablo","Breaking Benjamin","Bring Me The Horizon","Bruce Dickinson","Brutus","Bullet for My Valentine","Bunbury","Burial","Burning Witches","Bury Tomorrow","Bury Your Dead","Burzum","Ca7riel y Paco Amoroso","Cage The Elephant","Caifanes","Caligula's Horse","Callejon","Calva Louise","Candlemass","Cannibal Corpse","Carach Angren","Carcass","Carnifex","Caskets","Cattle Decapitation","Cavetown","Cavernous Gate","Celestite","Celtic Frost","Cerebral Rot","Chappell Roan","Charli XCX","Chelsea Grin","Childish Gambino","Children of Bodom","Chon","Chris Cornell","Circles","City of Caterpillar","Clairo","Cloudkicker","Clowncore","Clutch","Code Orange","Conan","Conjurer","Converge","Counting Crows","Cradle of Filth","Crisix","Crown The Empire","Cuco","Cuentos de los Hermanos Grind","Cult of Luna","Currents","Cynic","Daft Punk","Dance Gavin Dance","Danny Brown","Dark Tranquillity","Darkspace","Darkthrone","Darkness","Daughter","David Bowie","Dayseeker","Dead by April","Dead Can Dance","Dead Kennedys","Deafheaven","Death","Death Cab for Cutie","Death to All","Deathchain","Deathgrips","Decrepit Birth","Deep Purple","Deicide","Deftones","Depeche Mode","Devin Townsend","Diamond Head","Dillinger Escape Plan","Dimmu Borgir","Dio","Dir En Grey","Dirty Honey","Dissection","Disembowelment","Dodheimsgard","Doom:VS","Down","Dropdead","Drowning Pool","Dua Lipa","Dying Fetus","Earth","Eidola","Ekhimosis","El Cuarteto De Nos","El mató a un policía motorizado","Elder","Electric Callboy","Eluveitie","Emarosa","Emperor","Employed to Serve","Enabler","En Septiembre No Hay Festivos","Ensiferum","Entheos","Epica","Erra","Escape the Fate","Ethel Cain","Evanescence","Evergrey","Every Time I Die","Evil Invaders","Ewigkeit","Exhorder","Exodus","Extreme","Eye of Nix","Fallujah","Fateless","Fates Warning","Fear Factory","Fever 333","Fields of the Nephilim","Fire from the Gods","Fit for a King","Fit for an Autopsy","Flaw","Fleshgod Apocalypse","Floral","Flyleaf","Flying Lotus","Fontaines D.C.","Foo Fighters","For Today","Foreigner","Frank Ocean","Franz Ferdinand","Frozen Soul","Full of Hell","Funeral for a Friend","Fury","Gaerea","Gatecreeper","Ghost","Ghost Bath","Ghostemane","Ghostkid","God Forbid","Godsmack","Goatwhore","Gold Necklace","Gorillaz","Gouge Away","Gojira","Gost","Graveyard","Green Day","Greeley Estates","Grief","Grim Reaper","Grimes","Grizzly Bear","Guardia","Guernica & Lorca","Guilt Machine","Gulch","Hail of Bullets","Hail The Sun","Haken","Halestorm","Halford","Hanging Garden","Happy Days","Harm's Way","Harry Styles","Hatebreed","Haunt","Haunter","Havok","Hayley Williams","He Is Legend","Heilung","Helheim","Helloween","Heroes del Silencio","Heriot","Hexis","High on Fire","HIM","Hombre a Júpiter","Honey Revenge","Hooded Menace","Hord","Horseback","Howard Shore","Hypocrisy","I Prevail","Ibridoma","Iced Earth","Icon for Hire","Iconoclast","Idle Hands","Igorrr","Ihsahn","Ill Niño","Illustrate","Immortal","Immolation","Imperial Triumphant","In Flames","Incantation","Insomnium","Integrity","Inter Arma","Interpol","Into Eternity","Intronaut","Iron Maiden","Isis","Issues","Issahn","It Dies Today","Jaded","Jaguar","Jaguares","Jambinai","Jarhead Fertilizer","Jason Richardson","Jax Jones","Jazz Cartier","Jeff Rosenstock","Jesus Piece","Jinjer","Joanna Newsom","Job for a Cowboy","Joe Satriani","John Frusciante","Jonathan Davis","Jorja Smith","Joji","Joy Division","JPEGmafia","Juanes","Jungle","Jurassic 5","Judas Priest","Kadavar","Kamelot","Kardashev","Katatonia","Kayo Dot","Kee of Hearts","Kendrick Lamar","Kevel","Khemmis","Kid Cudi","Killswitch Engage","King Crimson","King Diamond","King Gizzard and the Lizard Wizard","Kiske/Somerville","Klubbe the Grinning Face","Knocked Loose","Knower","Kodaline","Konvent","Korn","Kraken","Kreator","Krisiun","Kublai Khan TX","Kyuss","L'Âme Immortelle","La Armada","La Dispute","La Pestilencia","Lacrimosa","Lacuna Coil","Lamb of God","Lantlôs","Last in Line","Latitudes","Led Zeppelin","Leeched","Leprous","Les Discrets","Light The Torch","Lika Nova","Lil Ugly Mane","Limp Bizkit","Lingua Ignota","Linkin Park","Lionize","Liturgy","Livløs","Long Distance Calling","Lord of the Lost","Lorde","Lorelei","Lorna Shore","Los Bunkers","Louis Cole","Lúnasa","Lunar Shadow","Lunatic Soul","Mac Miller","Machine Head","Madvillain","Make Them Suffer","Manes","Maneskin","Mantar","Marduk","Mare Cognitum","Marillion","Maribou State","Martyrdöd","Masacre","Mass Hysteria","Mastodon","Mayhem","Melvins","Memento Mori","Mercyful Fate","Megadeth","Meshuggah","Metallica","Metronomy","Mgła","Michael Jackson","Midnight","Miranda","Mise en Scene","Misery Index","Miss May I","Modern Color","Molotov","Monolord","Moonblood","Moonspell","Morbid Angel","Mortiis","Moscow Death Brigade","Motionless in White","Mouth of the Architect","Movements","Mr. Bungle","Mudvayne","Mudhoney","Municipal Waste","Muse","Mutoid Man","My Chemical Romance","Nachtmystium","Nails","Napalm Death","Nargaroth","Nasum","Natural Tones","Ne Obliviscaris","Neck Deep","Nero di Marte","Nervosa","Neurosis","Nickelback","Nightwish","Nile","Nine Inch Nails","Nocturnus AD","Nocturnalia","Norma Jean","Northlane","Not Blood Paint","Nothing","Nova Twins","Novembers Doom","Nuclear Assault","Nuvolascura","Ñengo Flow","Ñu","Oathbreaker","Obituary","Obscura","Ocean Grove","Oceans Ate Alaska","Odetari","Of Feather and Bone","Of Mice and Men","Ofeliadusk","Old Man Gloom","Olivia Rodrigo","Opeth","Oranssi Pazuzu","Orbit Culture","Order of Nosferat","Origin","Orphaned Land","Otargos","Otoboke Beaver","Our Hollow Our Home","Outkast","Outrun the Sunlight","Ovid's Withering","Owel","Owing","Ozzy Osbourne","Pain","Pallbearer","Panopticon","Pantera","Parabellum","Paramore","Paradise Lost","Parcels","Parkway Drive","Passenger","Patriarchs in Black","Pelican","Periphery","Perturbator","Phinehas","Pig Destroyer","Pink Floyd","Pink Pantheress","Pixies","Planks","Plini","Polaris","Polyphia","Pomegranate Tiger","Poppy","Porcupine Tree","Portrayal of Guilt","Power Trip","Pridelands","Primordial","Prince","Primus","Protest the Hero","Psyclon Nine","Pure Reason Revolution","Pxndx","Psychonaut 4","Queen","Queens of the Stone Age","Queensrÿche","Qohelet","Quorthon","Queue","Quicksand","Quietdrive","Quit Your Daydream","Rage Against the Machine","Rainbow","Rammstein","Razor","Reb Beach","Red Fang","Red Hot Chili Peppers","Reencarnación","Refused","Regarde les Hommes Tomber","Revocation","Rex Orange County","Rich Brian","Rings of Saturn","Rise Against","Rivers of Nihil","Rob Zombie","Rob Halford","Ro Ransom","Rotting Christ","Roughly Right","Royal Blood","Royal Coda","Royal Thunder","Ruïm","Run the Jewels","Rush","Russian Circles","Sabaton","Sabrina Carpenter","Sacred Reich","Sadus","Samael","Saor","Saosin","Sargeist","Sarkom","Satyricon","Savage Aggression","Schammasch","Scorpions","Secret Sphere","Self Checkout","Semagrl","Sentenced","Septic Flesh","Sepultura","Serpent Column","Shakira","Shining","Shrine of Insanabilis","Sikth","Silverstein","Sinister","Skeletonwitch","Skinless","Slayer","Sleep Token","Slipknot","Slow Death","Soen","Sodom","Solstafir","Somali Yacht Club","Son Lux","Sorrow Plagues","Soul Glo","Soundgarden","Spectral Wound","Spiritbox","Spite","Stam1na","Starset","Static X","Steven Wilson","Stone Sour","Stormkeep","Subrosa","Suffering Hour","Suicideboys","Suicide Silence","Summoning","Sun Kil Moon","Sum 41","Superlitio","Svalbard","Swallow the Sun","System of a Down","Taake","Tallah","Tame Impala","Tangerine Dream","Tatu","Tears of Misery","Teleman","Terra Tenebrosa","Testament","Tesseract","The Acacia Strain","The Agonist","The Algorithm","The Amity Affliction","The Atlas Moth","The Beatles","The Black Dahlia Murder","The Body","The Contortionist","The Cure","The Devil Wears Prada","The Dillinger Escape Plan","The Faceless","The Gaslight Anthem","The Haunted","The Hives","The Home Team","The Mars Volta","The National","The Ocean","The Offspring","The Pineapple Thief","The Protagonist","The Rasmus","The Rolling Stones","The Sorrow","The Strokes","The Sword","The Warning","The Weeknd","Thirty Seconds to Mars","Three Days Grace","Thulcandra","Thy Art is Murder","Tides of Man","Tombs","Tool","Torche","Touché Amoré","Trivium","Triptykon","True Widow","Tsjuder","Turnstile","Twilight Force","Twenty One Pilots","Type O Negative","Uada","Uaral","Ulcerate","Ulver","Ulthar","Umbra Vitae","Unearth","Uniformity","United in Hate","Until I Wake","Unto Others","Unprocessed","Unwell","Upheaval","Urgehal","Usnea","Utsu-P","Vader","Vallenfyre","Vampillia","Vanum","Varials","Vektor","Venom","Venom Prison","Violator","Vital Remains","Voivod","Vola","Voltaic","Vomitory","Vukovi","Vulfpeck","Vulture","Vvilderness","Wage War","Wallows","Wardruna","Watain","We Butter the Bread with Butter","We Came as Romans","Weezer","While She Sleeps","Whiplash","Whitechapel","Whitesnake","Wilderun","Windhand","Witch Ripper","Witchery","Witchtrap","Within Temptation","Wolf & Bear","Wolves in the Throne Room","Woods of Ypres","Worm","Wormed","Wormrot","Wrekmeister Harmonies","Wristmeetrazor","Xael","Xasthur","Xenobiotic","Xerath","Xibalba","Xiu Xiu","XYLØ","Yautja","Yes","Yob","Young Fathers","Young the Giant","Youth Code","Yugen Blakrok","Yung Lean","Zeal & Ardor","Zebrahead","Zero Hour","Zhrine","Zoé","Zombie Zombie","Zornheym","Zulu","Zun"];
+const DEFAULT_BANDS = ["10 Years","1349","16","1782","2 Chainz","21 Pilots","21 Savage","2pac","36 Crazyfists","3teeth","40 Watt Sun","43","5 Finger Death Punch","65daysofstatic","7 Horns 7 Eyes","800percent","9 Treasures","A Perfect Circle","Abiotic","Acutor","AFI","After the Burial","Agalloch","Aggressive","Agony","Agrimonia","Akercocke","Akheron","Alcest","Alesana","Alice in Chains","All Shall Perish","All That Remains","Allegaeon","Allegiance","Altars of Grief","Amenra","Amon Amarth","Anaal Nathrakh","Anciients","Anekdoten","Angine de Poitrine","Animals as Leaders","Annihilator","Anthrax","Apocalyptica","Arch Enemy","Archspire","Arctic Monkeys","Ariana Grande","Armored Saint","As I Lay Dying","ASAP Rocky","Asking Alexandria","Astronoid","Asura","Aterciopelados","Athanator","Atilla","Audioslave","Audrey Fall","August Burns Red","Avantasia","Avenged Sevenfold","Avril Lavigne","Azure Emote","Baby Keem","Backxwash","Bad Omens","Balmog","Band of Skulls","Baroness","Bathory","Battle Beast","Be'lakor","Beartooth","Beenee","Behemoth","Ben Rosett","Between the Buried and Me","Beyond Creation","Bilmuri","Black Label Society","Black Peaks","Black Sabbath","Bleed From Within","Blind Guardian","Blink 182","Blood Incantation","Bloodbath","Borknagar","Born of Osiris","Botch","Boucle Infinie","Boy Pablo","Breaking Benjamin","Bring Me the Horizon","Bruce Dickinson","Brutus","Bullet for My Valentine","Bunbury","Burial","Burning Witches","Bury Tomorrow","Bury Your Dead","Burzum","Cage The Elephant","Caifanes","Caligula's Horse","Callejon","Calva Louise","Candlemass","Cannibal Corpse","Carach Angren","Carcass","Carnifex","Caskets","Catriel y Paco Amoroso","Cattle Decapitation","Cavernous Gate","Cavetown","Celestite","Celtic Frost","Cerebral Rot","Chappell Roan","Charli XCX","Chelsea Grin","Childish Gambino","Children of Bodom","Chon","Chris Cornell","Circles","City of Caterpillar","Clairo","Cloudkicker","Clowncore","Clutch","Code Orange","Conan","Conjurer","Converge","Counting Crows","Cradle of Filth","Credence Clearwater Revival","Crisix","Crown The Empire","Cuco","Cuentos de los Hermanos Grind","Cult of Luna","Currents","Cynic","Daft Punk","Dance Gavin Dance","Danny Brown","Dark Tranquillity","Darkness","Darkspace","Darkthrone","Daughter","David Bowie","Dayseeker","Dead by April","Dead Can Dance","Dead Kennedys","Deafheaven","Death","Death Cab for Cutie","Death to All","Deathchain","Deathgrips","Decrepit Birth","Deep Purple","Deftones","Deicide","Depeche Mode","Devin Townsend","Diamante Eléctrico","Diamond Head","Dillinger Escape Plan","Dimmu Borgir","Dio","Dir En Grey","Dirty Honey","Disembowelment","Dissection","Dodheimsgard","Doom:VS","Down","Dragón y Caballero","Dropdead","Drowning Pool","Dua Lipa","Dying Fetus","Earth","Eidola","Ekhimosis","El Cuarteto De Nos","El mató a un policía motorizado","Elder","Electric Callboy","Electric Light Orchestra","Eluveitie","Emarosa","Emperor","Employed to Serve","En Septiembre No Hay Festivos","Enabler","Ensiferum","Entheos","Epica","Erra","Erykah Badu","Escape the Fate","Ethel Cain","Evanescence","Evergrey","Every Time I Die","Evil Invaders","Ewigkeit","Exhorder","Exodus","Extreme","Eye of Nix","Fallujah","Fateless","Fates Warning","Fear Factory","Fever 333","Fields of the Nephilim","Fire from the Gods","Fit for a King","Fit for an Autopsy","Flaw","Fleshgod Apocalypse","Floral","Flying Lotus","Flyleaf","Fontaines D.C.","Foo Fighters","For Today","Foreigner","Frank Ocean","Franz Ferdinand","Frozen Soul","Full of Hell","Funeral for a Friend","Fury","Gaerea","Gatecreeper","Ghost","Ghost Bath","Ghostemane","Ghostkid","Glue Trip","Goatwhore","God Forbid","Godsmack","Gojira","Gold Necklace","Gorillaz","Gost","Gouge Away","Graveyard","Greeley Estates","Green Day","Grief","Grim Reaper","Grimes","Grizzly Bear","Grupo Putumayo","Guardia","Guernica & Lorca","Guilt Machine","Gulch","Hail of Bullets","Hail The Sun","Haken","Halestorm","Halford","Hanging Garden","Happy Days","Harm's Way","Harry Styles","Hatebreed","Haunt","Haunter","Havok","Hayley Williams","He Is Legend","Heilung","Helheim","Helloween","Heriot","Héroes del Silencio","Hexis","High on Fire","HIM","Hombre a Júpiter","Honey Revenge","Hooded Menace","Hord","Horseback","Howard Shore","Hypocrisy","I Prevail","Ibridoma","Iced Earth","Icon for Hire","Iconoclast","Idle Hands","Igorrr","Ihsahn","Ill Niño","Illustrate","Immolation","Immortal","Imperial Triumphant","In Flames","Incantation","indigo la End","Insomnium","Integrity","Inter Arma","Interpol","Into Eternity","Intronaut","Iron Maiden","Isis","Issahn","Issues","It Dies Today","Jaded","Jaguar","Jaguares","Jambinai","Jarhead Fertilizer","Jason Richardson","Jax Jones","Jazz Cartier","Jeff Buckley","Jeff Rosenstock","Jesus Piece","Jinjer","Joanna Newsom","Job for a Cowboy","Joe Satriani","John Frusciante","Joji","Jonathan Davis","Jorja Smith","Joy Division","JPEGmafia","Juanes","Judas Priest","Jungle","Jurassic 5","Kadavar","Kamelot","Kanye West","Kardashev","Karol G","Katatonia","Kayo Dot","Kee of Hearts","Kendrick Lamar","Kevel","Khemmis","Khruangbin","Kid Cudi","Killswitch Engage","King Crimson","King Diamond","King Gizzard and the Lizard Wizard","Kiske/Somerville","Klubbe the Grinning Face","Knocked Loose","Knower","Kodaline","Konvent","Korn","Kraken","Kreator","Krisiun","Kublai Khan TX","Kyuss","L'Âme Immortelle","La Armada","La Dispute","La Pestilencia","Lacrimosa","Lacuna Coil","Lamb of God","Lantlôs","Last in Line","Latitudes","Led Zeppelin","Leeched","Leprous","Les Discrets","Light The Torch","Lika Nova","Lil Ugly Mane","Limp Bizkit","Lingua Ignota","Linkin Park","Lionize","Liturgy","Livløs","Long Distance Calling","Lord of the Lost","Lorde","Lorelei","Lorna Shore","Los Bunkers","Louis Cole","Lunar Shadow","Lúnasa","Lunatic Soul","Mac Miller","Machine Head","Madvillain","Make Them Suffer","Manes","Manga","Mantar","Marduk","Mare Cognitum","Maribou State","Marillion","Martyrdöd","Masacre","Mass Hysteria","Mastodon","Mayhem","Megadeth","Melvins","Memento Mori","Mercyful Fate","Meshuggah","Metallica","Metronomy","Mgła","Michael Jackson","Midnight","Miley Cyrus","Miranda","Mise en Scene","Misery Index","Miss May I","Modern Color","Molotov","Monolord","Moonblood","Moonspell","Morbid Angel","Mortiis","Moscow Death Brigade","Motionless in White","Mouth of the Architect","Movements","Mr. Bungle","Mudhoney","Mudvayne","Municipal Waste","Muse","Mutoid Man","My Chemical Romance","Måneskin","Nachtmystium","Nails","Napalm Death","Nargaroth","Nasum","Natural Tones","Ne Obliviscaris","Neck Deep","Ñengo Flow","Nero di Marte","Nervosa","Neurosis","Nickelback","Nightwish","Nile","Nine Inch Nails","Nocturnalia","Nocturnus AD","Norma Jean","Northlane","Not Blood Paint","Nothing","Nova Twins","Novembers Doom","Ñu","Nuclear Assault","Nuvolascura","Oathbreaker","Obituary","Obscura","Ocean Grove","Oceans Ate Alaska","Odetari","Of Feather and Bone","Of Mice and Men","Ofeliadusk","Old Man Gloom","Olivia Rodrigo","Opeth","Oranssi Pazuzu","Orbit Culture","Order of Nosferat","Origin","Orphaned Land","Otargos","Otoboke Beaver","Our Hollow Our Home","Outkast","Outrun the Sunlight","Ovid's Withering","Owel","Owing","Ozzy Osbourne","Pain","Pallbearer","Panopticon","Pantera","Parabellum","Paradise Lost","Paramore","Parcels","Parkway Drive","Passenger","Patriarchs in Black","Pelican","Periphery","Perturbator","Phinehas","Pig Destroyer","Pink Floyd","Pink Pantheress","Pixies","Planks","Plini","Polaris","Polyphia","Pomegranate Tiger","Poppy","Porcupine Tree","Portrayal of Guilt","Power Trip","Pridelands","Primordial","Primus","Prince","Protest the Hero","Psychonaut 4","Psyclon Nine","Pure Reason Revolution","Pxndx","Qohelet","Queen","Queens of the Stone Age","Queensrÿche","Queue","Quicksand","Quietdrive","Quit Your Daydream","Quorthon","Rage Against the Machine","Rainbow","Rammstein","Rawayana","Razor","Reb Beach","Red Fang","Red Hot Chili Peppers","Reencarnación","Refused","Regarde les Hommes Tomber","Revocation","Rex Orange County","Rich Brian","Rings of Saturn","Rise Against","Rivers of Nihil","Ro Ransom","Rob Halford","Rob Zombie","Roky Erickson","Romeo Elvis","Roots","Rotting Christ","Roughly Right","Royal Blood","Royal Coda","Royal Thunder","Run the Jewels","Rush","Russian Circles","Russkaja","Ruïm","Sabaton","Sabrina Carpenter","Sacred Reich","Sadus","Sakanaction","Samael","Saor","Saosin","Sargeist","Sarkom","Satyricon","Savage Aggression","Schammasch","Scorpions","Secret Sphere","Self Checkout","Semagrl","Sentenced","Septic Flesh","Sepultura","Serpent Column","Set It Off","Shakira","Shining","Shrine of Insanabilis","Sikth","Silverstein","Sinister","Skeletonwitch","Skinless","Slayer","Sleep Token","Slipknot","Slow Death","Sodom","Soen","Solstafir","Somali Yacht Club","Son Lux","Sorrow Plagues","Soul Glo","Soundgarden","Spectral Wound","Spiritbox","Spite","Stam1na","Starset","Static X","Steven Wilson","Stone Sour","Stormkeep","Subrosa","Suffering Hour","Suicide Silence","Suicideboys","Sum 41","Summoning","Sun Kil Moon","Superlitio","Supertramp","Svalbard","Swallow the Sun","System of a Down","Taake","Tallah","Tame Impala","Tangerine Dream","Tatu","Tears of Misery","Teleman","Terra Tenebrosa","Tesseract","Testament","The Acacia Strain","The Agonist","The Algorithm","The Amity Affliction","The Atlas Moth","The Beatles","The Black Dahlia Murder","The Blaze","The Body","The Contortionist","The Cure","The Devil Wears Prada","The Dillinger Escape Plan","The Faceless","The Gaslight Anthem","The Haunted","The Hives","The Home Team","The Mars Volta","The National","The Ocean","The Offspring","The Pineapple Thief","The Protagonist","The Rasmus","The Rolling Stones","The Roots","The Sacred Souls","The Sorrow","The Strokes","The Sword","The Warning","The Weeknd","Thirty Seconds to Mars","Three Days Grace","Thulcandra","Thy Art is Murder","Tides of Man","Tombs","Tool","Torche","Touché Amoré","Triptykon","Trivium","True Widow","Tsjuder","Turnstile","Twenty One Pilots","Twilight Force","Type O Negative","Uada","Uaral","Ulcerate","Ulthar","Ulver","Umbra Vitae","Unearth","Uniformity","United in Hate","Unprocessed","Until I Wake","Unto Others","Unwell","Upheaval","Urgehal","Usnea","Utsu-P","Vader","Vallenfyre","Vampillia","Vanum","Varials","Vektor","Venom","Venom Prison","Violator","Vital Remains","Voivod","Vola","Voltaic","Vomitory","Vukovi","Vulfpeck","Vulture","Vvilderness","Wage War","Wallows","Wardruna","Watain","We Butter the Bread with Butter","We Came as Romans","Weezer","While She Sleeps","Whiplash","Whitechapel","Whitesnake","Wilderun","Windhand","Witch Ripper","Witchery","Witchtrap","Within Temptation","Wolf & Bear","Wolves in the Throne Room","Woods of Ypres","Worm","Wormed","Wormrot","Wrekmeister Harmonies","Wristmeetrazor","Xael","Xasthur","Xenobiotic","Xerath","Xibalba","Xiu Xiu","XYLØ","Yautja","Yes","Yob","Young Fathers","Young the Giant","Youth Code","Yugen Blakrok","Yung Lean","Zeal & Ardor","Zebrahead","Zero Hour","Zhrine","Zoé","Zombie Zombie","Zornheym","Zulu","Zun"];
+
+function mkAlbum(id, name) {
+  return { id, name, link:"", artUrl:"", genre:"", listened:false, second:false, rating1:0, rating2:0, opinion:"", opinion2:"", favSong:"", skipSong:"" };
+}
+
+const DEFAULT_STATE = {
+  "21 Pilots":                { albums: [mkAlbum("a1",  "Blurryface")] },
+  "Agalloch":                 { albums: [mkAlbum("a2",  "Pale Folklore")] },
+  "Alesana":                  { albums: [mkAlbum("a3",  "The Emptiness")] },
+  "Alice in Chains":          { albums: [mkAlbum("a4",  "Unplugged")] },
+  "Avril Lavigne":            { albums: [mkAlbum("a5",  "Let Go")] },
+  "Avenged Sevenfold":        { albums: [mkAlbum("a6",  "Live at the LBC")] },
+  "Bring Me the Horizon":     { albums: [mkAlbum("a7",  "That's the Spirit")] },
+  "Catriel y Paco Amoroso":   { albums: [mkAlbum("a8",  "Papota")] },
+  "Credence Clearwater Revival": { albums: [mkAlbum("a9", "Pendulum")] },
+  "Daft Punk":                { albums: [mkAlbum("a10", "Discovery")] },
+  "David Bowie":              { albums: [mkAlbum("a11", "Aladdin Sane")] },
+  "Diamante Eléctrico":       { albums: [mkAlbum("a12", "Mira Lo Que Me Hiciste Hacer")] },
+  "Dragón y Caballero":       { albums: [mkAlbum("a13", "Dragón y Caballero")] },
+  "Electric Light Orchestra": { albums: [mkAlbum("a14", "A New World Record")] },
+  "Erykah Badu":              { albums: [mkAlbum("a15", "North Jazz Festival")] },
+  "Frank Ocean":              { albums: [mkAlbum("a16", "Channel Orange")] },
+  "Glue Trip":                { albums: [mkAlbum("a17", "Nada Tropical")] },
+  "Grupo Putumayo":           { albums: [mkAlbum("a18", "Tejiendo Raíces")] },
+  "Halestorm":                { albums: [mkAlbum("a19", "The Strange Case Of...")] },
+  "Harry Styles":             { albums: [mkAlbum("a20", "Harry Styles")] },
+  "Héroes del Silencio":      { albums: [mkAlbum("a21", "El Espíritu del Vino")] },
+  "indigo la End":            { albums: [mkAlbum("b1",  "Nureyuku Shishōsetsu")] },
+  "Jeff Buckley":             { albums: [mkAlbum("a22", "Grace")] },
+  "Kanye West":               { albums: [mkAlbum("a23", "Graduation")] },
+  "Karol G":                  { albums: [mkAlbum("a24", "Tropicoqueta")] },
+  "Khruangbin":               { albums: [mkAlbum("a25", "Con Todo el Mundo")] },
+  "Louis Cole":               { albums: [mkAlbum("a26", "Nothing")] },
+  "Manga":                    { albums: [mkAlbum("b2",  "Şehr-i Hüzün")] },
+  "Måneskin":                 { albums: [mkAlbum("b3",  "Teatro d'ira: Vol. I")] },
+  "Miley Cyrus":              { albums: [mkAlbum("a27", "The Time of Our Lives")] },
+  "Muse":                     { albums: [mkAlbum("a28", "Live at Wembley")] },
+  "My Chemical Romance":      { albums: [mkAlbum("a29", "Three Cheers for Sweet Revenge")] },
+  "Opeth":                    { albums: [mkAlbum("b4",  "In Cauda Venenum (Swedish Version)")] },
+  "Paradise Lost":            { albums: [mkAlbum("a30", "Paradise Lost")] },
+  "Parcels":                  { albums: [mkAlbum("a31", "Live Vol. 1")] },
+  "Pxndx":                    { albums: [mkAlbum("a32", "MTV Unplugged")] },
+  "Rawayana":                 { albums: [mkAlbum("a33", "Trippy Caribbean")] },
+  "Roky Erickson":            { albums: [mkAlbum("a34", "The Evil One")] },
+  "Romeo Elvis":              { albums: [mkAlbum("b5",  "Chocolat")] },
+  "Roots":                    { albums: [mkAlbum("b6",  "The Cavemen")] },
+  "Russkaja":                 { albums: [mkAlbum("b7",  "Kosmopoliturbo")] },
+  "Sakanaction":              { albums: [mkAlbum("b8",  "834.194")] },
+  "Set It Off":               { albums: [mkAlbum("a35", "Upside Down")] },
+  "Shakira":                  { albums: [mkAlbum("a36", "¿Dónde Están los Ladrones?")] },
+  "Supertramp":               { albums: [mkAlbum("a37", "Breakfast in America")] },
+  "The Agonist":              { albums: [mkAlbum("a38", "Prisoners")] },
+  "The Blaze":                { albums: [mkAlbum("a39", "Territory")] },
+  "The Roots":                { albums: [mkAlbum("a40", "Things Fall Apart")] },
+  "The Sacred Souls":         { albums: [mkAlbum("a41", "The Sacred Souls")] },
+  "The Strokes":              { albums: [mkAlbum("a42", "The New Abnormal")] },
+  "Utsu-P":                   { albums: [mkAlbum("b9",  "PERFECT PERSONA")] },
+  "Zoé":                      { albums: [mkAlbum("a43", "MTV Unplugged Música de Fondo")] },
+};
 
 // State structure:
 // bands = ['Agalloch', ...]
 // state = { 'Agalloch': { albums: [{ id, name, link, artUrl, first, second, rating1, rating2, opinion1, opinion2 }] } }
 
-const STORAGE_KEY = 'music_tracker_v3';
+const STORAGE_KEY = 'music_tracker_friends_v1';
 let bands = [], state = {}, currentFilter = 'all', searchQuery = '', isDark = true;
 let currentBand = null, currentAlbumId = null, artRating1 = 0, artRating2 = 0, pendingArt = null;
+let genreFilter = 'all', starFilter = 0;
 
 // ===== HELPERS =====
 function normSort(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/^ñ/,'n~').replace(/ñ/g,'n~'); }
@@ -292,8 +394,8 @@ function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) { const d = JSON.parse(raw); bands = d.bands||[...DEFAULT_BANDS]; state = d.state||{}; }
-    else { bands = [...DEFAULT_BANDS]; state = {}; }
-  } catch(e) { bands = [...DEFAULT_BANDS]; state = {}; }
+    else { bands = [...DEFAULT_BANDS]; state = JSON.parse(JSON.stringify(DEFAULT_STATE)); }
+  } catch(e) { bands = [...DEFAULT_BANDS]; state = JSON.parse(JSON.stringify(DEFAULT_STATE)); }
   bands = sortBands([...new Set(bands)]);
   // Migrate old format (v2 → v3)
   for (const b of bands) {
@@ -313,28 +415,69 @@ function getBandStatus(band) {
   const albums = getBandAlbums(band);
   if (!albums.length) return 'pending';
   if (albums.some(a => a.second)) return 'second';
-  if (albums.some(a => a.first)) return 'first';
+  if (albums.some(a => a.listened || a.first)) return 'first';
   return 'pending';
+}
+
+function getBandAvgRating(band) {
+  const albums = getBandAlbums(band).filter(a => (a.rating1||0) > 0 || (a.rating2||0) > 0);
+  if (!albums.length) return 0;
+  const albumAvgs = albums.map(a => {
+    const r1 = a.rating1 || 0;
+    const r2 = a.rating2 || 0;
+    if (r1 && r2) return (r1 + r2) / 2;
+    return r1 || r2;
+  });
+  return albumAvgs.reduce((s, v) => s + v, 0) / albumAvgs.length;
 }
 
 function updateStats() {
   const total = bands.length;
   const totalAlbums = bands.reduce((n,b) => n + getBandAlbums(b).length, 0);
+  const listenedCount = bands.reduce((n,b) => n + getBandAlbums(b).filter(a=>a.listened||a.first).length, 0);
   const secondCount = bands.reduce((n,b) => n + getBandAlbums(b).filter(a=>a.second).length, 0);
-  const withFirst = bands.filter(b => getBandAlbums(b).some(a=>a.first)).length;
+  const withListened = bands.filter(b => getBandAlbums(b).some(a=>a.listened||a.first)).length;
   document.getElementById('totalCount').textContent = total;
   document.getElementById('albumCount').textContent = totalAlbums;
-  document.getElementById('secondCount').textContent = secondCount;
-  document.getElementById('progressFill').style.width = (total ? withFirst/total*100 : 0) + '%';
+  document.getElementById('listenedCount').textContent = listenedCount;
+  const secEl = document.getElementById('secondCount');
+  if (secEl) secEl.textContent = secondCount;
+  document.getElementById('progressFill').style.width = (total ? withListened/total*100 : 0) + '%';
 }
 
 // ===== MAIN LIST =====
+function getBandGenres(band) {
+  const albums = getBandAlbums(band);
+  const genres = albums.map(a=>a.genre).filter(Boolean);
+  return [...new Set(genres)];
+}
+
+function getAllGenres() {
+  const all = bands.flatMap(b => getBandAlbums(b).map(a=>a.genre).filter(Boolean));
+  return [...new Set(all)].sort();
+}
+
+function renderGenreFilter() {
+  const genres = getAllGenres();
+  const row = document.getElementById('genreFilterRow');
+  row.innerHTML = `<button class="tab2 ${genreFilter==='all'?'active':''}" data-genre="all">🎵 Todos</button>`
+    + genres.map(g=>`<button class="tab2 ${genreFilter===g?'active':''}" data-genre="${g}">${g}</button>`).join('');
+  row.querySelectorAll('[data-genre]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      genreFilter = btn.dataset.genre;
+      renderGenreFilter(); renderList();
+    });
+  });
+}
+
 function getFiltered() {
   let list = bands;
   if (searchQuery) { const q=searchQuery.toLowerCase(); list=list.filter(b=>b.toLowerCase().includes(q)); }
   if (currentFilter==='pending') list=list.filter(b=>getBandStatus(b)==='pending');
-  else if (currentFilter==='first') list=list.filter(b=>getBandAlbums(b).some(a=>a.first));
+  else if (currentFilter==='first') list=list.filter(b=>getBandAlbums(b).some(a=>a.listened||a.first));
   else if (currentFilter==='second') list=list.filter(b=>getBandAlbums(b).some(a=>a.second));
+  if (genreFilter!=='all') list=list.filter(b=>getBandAlbums(b).some(a=>a.genre===genreFilter));
+  if (starFilter>0) list=list.filter(b=>getBandAvgRating(b)>=starFilter);
   return list;
 }
 
@@ -352,9 +495,13 @@ function renderList() {
     if (letter !== lastLetter) { html += `<div class="section-letter" id="letter-${letter}">${letter}</div>`; lastLetter = letter; }
     const albums = getBandAlbums(band);
     const status = getBandStatus(band);
-    const rowClass = albums.some(a=>a.second) ? 'all-second' : albums.length ? 'has-albums' : '';
+    const rowClass = albums.some(a=>a.listened||a.first) ? 'has-albums' : '';
     const safe = band.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     const albumCount = albums.length ? `<span>${albums.length} álbum${albums.length>1?'es':''}</span>` : '<span style="color:var(--text-muted)">Sin álbumes</span>';
+    const avg = getBandAvgRating(band);
+    const avgStars = avg>0 ? `<span class="band-avg-stars">${'★'.repeat(Math.round(avg))}${'☆'.repeat(5-Math.round(avg))} <span style="font-size:10px;color:var(--text-muted)">(${avg.toFixed(1)})</span></span>` : '';
+    const genres = getBandGenres(band);
+    const genreChips = genres.map(g=>`<span class="genre-chip">${g}</span>`).join('');
     const thumbs = albums.slice(0,4).map(a => a.artUrl
       ? `<img class="album-thumb" src="${a.artUrl}" onerror="this.remove()">`
       : `<div class="album-thumb-placeholder">💿</div>`
@@ -363,7 +510,8 @@ function renderList() {
     <div class="band-row ${rowClass}">
       <div class="band-info" onclick="openBandModal('${safe}')">
         <div class="band-name">${band}</div>
-        <div class="band-meta">${albumCount}</div>
+        <div class="band-meta">${albumCount}${avgStars}</div>
+        ${genreChips ? `<div style="margin-top:3px;display:flex;flex-wrap:wrap;gap:3px">${genreChips}</div>` : ''}
         ${albums.length ? `<div class="album-thumbs">${thumbs}</div>` : ''}
       </div>
       <div class="band-actions">
@@ -407,19 +555,24 @@ function renderBandModalBody() {
     const artHTML = album.artUrl
       ? `<div class="album-card-art"><img src="${album.artUrl}" onerror="this.parentElement.innerHTML='💿'"></div>`
       : `<div class="album-card-art">💿</div>`;
-    const c1 = album.first ? 'c1' : '';
-    const c2 = album.second ? 'c2' : '';
-    const stars = album.rating1 ? `<span class="mini-stars">${starsHTML(album.rating1)}</span>` : '';
+    const heard = album.listened || album.first;
+    const dot1 = heard ? 'c1' : '';
+    const dot2 = album.second ? 'c2' : '';
+    const r1 = album.rating1||0, r2 = album.rating2||0;
+    const albumRating = (r1 && r2) ? (r1+r2)/2 : (r1||r2);
+    const stars = albumRating ? `<span class="mini-stars">${starsHTML(Math.round(albumRating))} <span style="font-size:9px;color:var(--text-muted)">(${albumRating.toFixed(1)})</span></span>` : '';
+    const fav = album.favSong ? `<span style="font-size:10px;color:var(--text-muted)">🎵 ${album.favSong}</span>` : '';
     html += `
     <div class="album-card" onclick="openAlbumModal('${safe}')">
       ${artHTML}
       <div class="album-card-info">
         <div class="album-card-name">${album.name || 'Sin nombre'}</div>
         <div class="album-card-checks">
-          <div class="mini-check"><div class="mini-dot ${c1}"></div> 1ª</div>
-          <div class="mini-check"><div class="mini-dot ${c2}"></div> 2ª</div>
+          <div class="mini-check"><div class="mini-dot ${dot1}"></div> 1ª</div>
+          <div class="mini-check"><div class="mini-dot ${dot2}"></div> 2ª</div>
           ${stars}
         </div>
+        ${fav}
       </div>
       <button class="album-card-delete" onclick="event.stopPropagation();deleteAlbum('${safe}')">🗑</button>
     </div>`;
@@ -448,29 +601,88 @@ function openAlbumModal(albumId) {
   artRating2 = album?.rating2 || 0;
   renderAlbumModalBody(album);
   document.getElementById('albumModal').classList.add('open');
+  if (!album?.artUrl || !album?.link) {
+    setTimeout(() => autoFetchAlbumData(album), 400);
+  }
+}
+
+async function autoFetchAlbumData(album) {
+  const nameEl = document.getElementById('albumName');
+  const linkEl = document.getElementById('albumLink');
+  if (!nameEl) return;
+  const name = nameEl.value.trim();
+  if (!name) return;
+  const query = `${currentBand} ${name}`;
+
+  // Fetch art if missing
+  if (!album?.artUrl) {
+    setArtLoading();
+    try {
+      const r = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=album&limit=5&media=music`);
+      if (r.ok) {
+        const d = await r.json();
+        if (d.results?.length) {
+          const artUrl = d.results[0].artworkUrl100.replace('100x100bb','600x600bb');
+          const base64 = await urlToBase64(artUrl);
+          if (base64) { setArtWrap(base64); pendingArt = base64; }
+          else setArtWrap(null);
+        } else setArtWrap(null);
+      } else setArtWrap(null);
+    } catch(e) { setArtWrap(null); }
+  }
+
+  // Fetch YouTube link if missing
+  if (!album?.link && linkEl) {
+    try {
+      const ytQuery = encodeURIComponent(`${currentBand} ${name} full album`);
+      const r = await fetch(`https://www.youtube.com/results?search_query=${ytQuery}`);
+      if (r.ok) {
+        const html = await r.text();
+        const match = html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
+        if (match) {
+          linkEl.value = `https://www.youtube.com/watch?v=${match[1]}`;
+        }
+      }
+    } catch(e) {}
+  }
 }
 
 function renderAlbumModalBody(album) {
   const body = document.getElementById('albumModalBody');
+  const esc = s => (s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;');
+
+  function fieldHTML(id, label, value, type='text', placeholder='') {
+    const isEmpty = !value;
+    const inputTag = type==='textarea'
+      ? `<textarea class="field-input" id="${id}" placeholder="${placeholder}">${esc(value)}</textarea>`
+      : `<input type="${type}" class="field-input" id="${id}" placeholder="${placeholder}" value="${esc(value)}">`;
+    return `
+    <div class="field-group" id="fg-${id}">
+      <label class="field-label">${label}</label>
+      <div class="field-static">
+        <div class="field-view">
+          <span class="field-view-text ${isEmpty?'empty':''}">${isEmpty ? placeholder : esc(value).replace(/\n/g,'<br>')}</span>
+          <button class="edit-pencil" onclick="enableEdit('${id}')">✏️</button>
+        </div>
+        ${inputTag}
+      </div>
+    </div>`;
+  }
+
   body.innerHTML = `
     <div id="artWrap" class="album-art-wrap"><div class="album-art-placeholder">🎵</div></div>
     <div class="art-btns">
       <button class="art-btn" id="searchArtBtn">🔍 Buscar portada</button>
       <label class="art-btn" style="cursor:pointer">📁 Subir imagen<input type="file" id="uploadArtInput" accept="image/*" style="display:none"></label>
     </div>
-    <div class="field-group">
-      <label class="field-label">📀 Nombre del álbum</label>
-      <input type="text" class="field-input" id="albumName" placeholder="Nombre del álbum..." value="${album?.name||''}">
-    </div>
-    <div class="field-group">
-      <label class="field-label">🔗 Link del álbum</label>
-      <input type="url" class="field-input" id="albumLink" placeholder="https://..." value="${album?.link||''}">
-    </div>
+    ${fieldHTML('albumName','📀 Nombre del álbum', album?.name||'', 'text', 'Nombre del álbum...')}
+    ${fieldHTML('albumLink','🔗 Link del álbum', album?.link||'', 'url', 'https://youtube.com/...')}
+    ${fieldHTML('albumGenre','🎸 Género', album?.genre||'', 'text', 'Rock, Metal, Jazz, Pop...')}
     <div class="section-divider"><span class="divider-label">1ª ESCUCHA</span><div class="divider-line"></div></div>
     <div class="field-group">
       <label class="field-label">✅ Escuchado</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-        <input type="checkbox" id="check1" ${album?.first?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)">
+        <input type="checkbox" id="check1" ${album?.listened||album?.first?'checked':''} style="width:18px;height:18px;accent-color:var(--accent)">
         <span style="font-size:14px;color:var(--text-dim)">Marcar 1ª escucha</span>
       </label>
     </div>
@@ -480,10 +692,9 @@ function renderAlbumModalBody(album) {
         ${[1,2,3,4,5].map(v=>`<span class="star ${artRating1>=v?'active':''}" data-v="${v}" data-which="1">★</span>`).join('')}
       </div>
     </div>
-    <div class="field-group">
-      <label class="field-label">💬 Opinión</label>
-      <textarea class="field-input" id="opinion1" placeholder="¿Qué te pareció en la primera escucha?">${album?.opinion1||''}</textarea>
-    </div>
+    ${fieldHTML('opinion1','💬 Opinión', album?.opinion||album?.opinion1||'', 'textarea', '¿Qué te pareció?')}
+    ${fieldHTML('favSong','🎵 Canción favorita', album?.favSong||'', 'text', 'Tu track preferido...')}
+    ${fieldHTML('skipSong','🔇 Canción menos favorita', album?.skipSong||'', 'text', 'La que te saltarías...')}
     <div class="section-divider"><span class="divider-label">2ª ESCUCHA</span><div class="divider-line"></div></div>
     <div class="field-group">
       <label class="field-label">✅ Escuchado</label>
@@ -498,37 +709,31 @@ function renderAlbumModalBody(album) {
         ${[1,2,3,4,5].map(v=>`<span class="star ${artRating2>=v?'active':''}" data-v="${v}" data-which="2">★</span>`).join('')}
       </div>
     </div>
-    <div class="field-group">
-      <label class="field-label">💬 Opinión</label>
-      <textarea class="field-input" id="opinion2" placeholder="¿Cambió tu opinión en la segunda escucha?">${album?.opinion2||''}</textarea>
-    </div>
+    ${fieldHTML('opinion2','💬 Opinión', album?.opinion2||'', 'textarea', '¿Cambió tu opinión?')}
     <button class="save-btn" id="saveAlbumBtn">GUARDAR</button>
   `;
 
-  // Show saved art
   if (album?.artUrl) setArtWrap(album.artUrl);
 
-  // Star events
   body.querySelectorAll('.star').forEach(s => {
     s.addEventListener('click', () => {
       const which = s.dataset.which;
       const val = parseInt(s.dataset.v);
-      if (which === '1') { artRating1 = val; updateStars('stars1', artRating1); }
-      else { artRating2 = val; updateStars('stars2', artRating2); }
+      if (which==='2') { artRating2=val; updateStars('stars2',artRating2); }
+      else { artRating1=val; updateStars('stars1',artRating1); }
     });
   });
 
-  // Upload
   body.querySelector('#uploadArtInput').addEventListener('change', e => {
-    const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = evt => { setArtWrap(evt.target.result); pendingArt = evt.target.result; showToast('🖼️ Imagen cargada!'); };
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=evt=>{ setArtWrap(evt.target.result); pendingArt=evt.target.result; showToast('🖼️ Imagen cargada!'); };
     reader.readAsDataURL(file); e.target.value='';
   });
 
-  // Search art
   body.querySelector('#searchArtBtn').addEventListener('click', async () => {
-    const name = body.querySelector('#albumName').value.trim();
+    const nameEl = body.querySelector('#albumName');
+    const name = nameEl?.value.trim() || album?.name || '';
     const query = name ? `${currentBand} ${name}` : currentBand;
     setArtLoading();
     try {
@@ -538,42 +743,48 @@ function renderAlbumModalBody(album) {
         if (d.results?.length) {
           const artUrl = d.results[0].artworkUrl100.replace('100x100bb','600x600bb');
           const base64 = await urlToBase64(artUrl);
-          if (base64) { setArtWrap(base64); pendingArt = base64; showToast('🎨 Portada encontrada!'); return; }
+          if (base64) { setArtWrap(base64); pendingArt=base64; showToast('🎨 Portada encontrada!'); return; }
         }
       }
     } catch(e) {}
     setArtWrap(null); showToast('😕 No se encontró portada');
   });
 
-  // Save
   body.querySelector('#saveAlbumBtn').addEventListener('click', () => {
-    if (!state[currentBand]) state[currentBand] = { albums: [] };
-    const albums = state[currentBand].albums;
+    if (!state[currentBand]) state[currentBand]={albums:[]};
+    const albums=state[currentBand].albums;
+    const nameEl=body.querySelector('#albumName');
+    const linkEl=body.querySelector('#albumLink');
+    const genreEl=body.querySelector('#albumGenre');
+    const op1El=body.querySelector('#opinion1');
+    const op2El=body.querySelector('#opinion2');
+    const favEl=body.querySelector('#favSong');
+    const skipEl=body.querySelector('#skipSong');
     const check1 = body.querySelector('#check1').checked;
     const check2 = body.querySelector('#check2').checked;
     const data = {
-      id: currentAlbumId || uid(),
-      name: body.querySelector('#albumName').value.trim(),
-      link: body.querySelector('#albumLink').value.trim(),
-      artUrl: pendingArt || (currentAlbumId ? albums.find(a=>a.id===currentAlbumId)?.artUrl : '') || '',
+      id: currentAlbumId||uid(),
+      name: nameEl?.value.trim()||album?.name||'',
+      link: linkEl?.value.trim()||album?.link||'',
+      genre: genreEl?.value.trim()||album?.genre||'',
+      artUrl: pendingArt||(currentAlbumId?albums.find(a=>a.id===currentAlbumId)?.artUrl:'')||'',
+      listened: check1,
       first: check1,
-      second: check2 ? true : check1 ? check1 : false,
+      second: check2,
       rating1: artRating1,
       rating2: artRating2,
-      opinion1: body.querySelector('#opinion1').value.trim(),
-      opinion2: body.querySelector('#opinion2').value.trim(),
+      opinion: op1El?.value.trim()||'',
+      opinion2: op2El?.value.trim()||'',
+      favSong: favEl?.value.trim()||'',
+      skipSong: skipEl?.value.trim()||'',
     };
     if (check2) data.first = true;
-    if (currentAlbumId) {
-      const idx = albums.findIndex(a=>a.id===currentAlbumId);
-      if (idx>=0) albums[idx] = data;
-    } else {
-      albums.push(data);
-    }
-    saveData(); updateStats(); renderList();
+    if (currentAlbumId) { const idx=albums.findIndex(a=>a.id===currentAlbumId); if(idx>=0) albums[idx]=data; }
+    else albums.push(data);
+    saveData(); updateStats(); renderList(); renderGenreFilter();
     document.getElementById('albumModal').classList.remove('open');
     renderBandModalBody();
-    showToast(`💾 Guardado!`);
+    showToast('💾 Guardado!');
   });
 }
 
@@ -645,6 +856,12 @@ document.querySelectorAll('.tab').forEach(tab => {
     tab.classList.add('active'); currentFilter = tab.dataset.filter; renderList();
   });
 });
+document.querySelectorAll('.tab2.star-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab2.star-tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active'); starFilter = parseInt(btn.dataset.stars); renderList();
+  });
+});
 document.getElementById('searchInput').addEventListener('input', e => { searchQuery=e.target.value.trim(); renderList(); });
 
 // ===== THEME =====
@@ -657,15 +874,7 @@ document.getElementById('themeBtn').addEventListener('click', () => {
 document.getElementById('ioBtn').addEventListener('click', () => document.getElementById('ioModal').classList.add('open'));
 document.getElementById('ioClose').addEventListener('click', () => document.getElementById('ioModal').classList.remove('open'));
 document.getElementById('ioModal').addEventListener('click', e => { if(e.target===document.getElementById('ioModal')) document.getElementById('ioModal').classList.remove('open'); });
-document.getElementById('exportBtn').addEventListener('click', () => {
-  const data = JSON.stringify({bands,state,exportedAt:new Date().toISOString()},null,2);
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([data],{type:'application/json'}));
-  a.download = `music-tracker-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  document.getElementById('ioModal').classList.remove('open');
-  showToast('📤 Progreso exportado!');
-});
+document.getElementById('exportBtn').addEventListener('click', doExport);
 document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
 document.getElementById('importFile').addEventListener('change', e => {
   const file = e.target.files[0]; if (!file) return;
@@ -684,8 +893,49 @@ document.getElementById('importFile').addEventListener('change', e => {
   reader.readAsText(file);
 });
 
+// ===== PENCIL EDIT =====
+function enableEdit(fieldId) {
+  const fg = document.getElementById('fg-' + fieldId);
+  if (!fg) return;
+  const input = fg.querySelector('.field-input');
+  const view = fg.querySelector('.field-view');
+  if (input) { input.style.display='block'; input.focus(); }
+  if (view) view.style.display='none';
+}
+
+// ===== SAVE REMINDER =====
+const REMINDER_KEY = 'club_last_export';
+const REMINDER_DAYS = 7;
+
+function checkReminder() {
+  const last = localStorage.getItem(REMINDER_KEY);
+  if (!last) return; // First time user — don't nag right away
+  const daysSince = (Date.now() - parseInt(last)) / (1000 * 60 * 60 * 24);
+  if (daysSince >= REMINDER_DAYS) {
+    setTimeout(() => {
+      document.getElementById('reminderBanner').classList.add('show');
+    }, 3000);
+  }
+}
+
+function doExport() {
+  const data = JSON.stringify({bands,state,exportedAt:new Date().toISOString()},null,2);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([data],{type:'application/json'}));
+  a.download = `club-musica-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  localStorage.setItem(REMINDER_KEY, Date.now().toString());
+  document.getElementById('reminderBanner').classList.remove('show');
+  showToast('📤 Progreso exportado!');
+}
+
+document.getElementById('reminderExportBtn').addEventListener('click', doExport);
+
 // ===== INIT =====
-loadData(); updateStats(); renderList();
+loadData(); updateStats(); renderList(); renderGenreFilter();
+// Set first-use timestamp if not set
+if (!localStorage.getItem(REMINDER_KEY)) localStorage.setItem(REMINDER_KEY, Date.now().toString());
+checkReminder();
 </script>
 </body>
 </html>
